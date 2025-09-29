@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Research Statistics Calculator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        line-height: 1.6;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      .floating-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 20s infinite ease-in-out;
+      }
+
+      .circle {
+        border-radius: 50%;
+        background: white;
+      }
+
+      .square {
+        background: white;
+      }
+
+      .triangle {
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 87px solid white;
+      }
+
+      .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+        animation-duration: 25s;
+      }
+
+      .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 60%;
+        left: 80%;
+        animation-delay: 3s;
+        animation-duration: 20s;
+      }
+
+      .shape:nth-child(3) {
+        top: 40%;
+        left: 5%;
+        animation-delay: 5s;
+        animation-duration: 22s;
+      }
+
+      .shape:nth-child(4) {
+        width: 100px;
+        height: 100px;
+        top: 70%;
+        left: 70%;
+        animation-delay: 2s;
+        animation-duration: 28s;
+      }
+
+      .shape:nth-child(5) {
+        width: 70px;
+        height: 70px;
+        top: 20%;
+        left: 85%;
+        animation-delay: 4s;
+        animation-duration: 24s;
+      }
+
+      .shape:nth-child(6) {
+        top: 80%;
+        left: 20%;
+        animation-delay: 6s;
+        animation-duration: 26s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        25% {
+          transform: translateY(-30px) rotate(90deg);
+        }
+        50% {
+          transform: translateY(-60px) rotate(180deg);
+        }
+        75% {
+          transform: translateY(-30px) rotate(270deg);
+        }
+      }
+
+      .side-nav {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px 10px;
+        border-radius: 30px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .nav-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ccc;
+        margin: 12px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .nav-dot:hover {
+        background: #667eea;
+        transform: scale(1.3);
+      }
+
+      .nav-dot.active {
+        background: #667eea;
+        transform: scale(1.5);
+      }
+
+      .nav-tooltip {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-dot:hover .nav-tooltip {
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        .side-nav {
+          right: 10px;
+          padding: 10px 8px;
+        }
+        .nav-dot {
+          width: 10px;
+          height: 10px;
+          margin: 10px 0;
+        }
+        .container {
+          padding-right: 40px;
+        }
+      }
+
+      #welcomeScreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        cursor: pointer;
+      }
+
+      #welcomeScreen.hidden {
+        animation: fadeOut 0.8s ease-in-out forwards;
+      }
+
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
+      .welcome-content {
+        text-align: center;
+        color: white;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .welcome-content h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      .welcome-content p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 10px;
+      }
+
+      .continue-btn {
+        margin-top: 40px;
+        padding: 15px 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        border-radius: 50px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        animation: pulse 2s infinite;
+        transition: all 0.3s ease;
+      }
+
+      .continue-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0);
+        }
+      }
+
+      .credit {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-top: 30px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        padding-right: 60px;
+      }
+
+      .header {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .header h1 {
+        color: #667eea;
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .calc-section {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        scroll-margin-top: 20px;
+      }
+
+      .section-title {
+        color: #667eea;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-icon {
+        font-size: 1.5rem;
+      }
+
+      label {
+        display: block;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        transition: border 0.3s;
+        font-family: inherit;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      button {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .result-card {
+        background: #f8f9ff;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 15px;
+        border-left: 4px solid #667eea;
+      }
+
+      .result-card h3 {
+        color: #667eea;
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+      }
+
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .result-item:last-child {
+        border-bottom: none;
+      }
+
+      .result-label {
+        color: #555;
+        font-weight: 500;
+      }
+
+      .result-value {
+        color: #333;
+        font-weight: 600;
+      }
+
+      .error {
+        background: #ffe0e0;
+        color: #cc0000;
+        padding: 15px;
+        border-radius: 12px;
+        margin-top: 15px;
+        border-left: 4px solid #cc0000;
+      }
+
+      .info-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+        font-style: italic;
+      }
+
+      .explanations {
+        background: white;
+        padding: 30px 25px;
+        border-radius: 20px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .explanations h2 {
+        color: #667eea;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      .explanation-item {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .explanation-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .explanation-item h3 {
+        color: #667eea;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .explanation-item p {
+        color: #555;
+        line-height: 1.7;
+        font-size: 0.95rem;
+      }
+
+      .footer {
+        text-align: center;
+        color: white;
+        padding: 20px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      @media (min-width: 768px) {
+        .header h1 {
+          font-size: 2.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="floating-shapes">
+      <div class="shape circle"></div>
+      <div class="shape square"></div>
+      <div class="shape triangle"></div>
+      <div class="shape circle"></div>
+      <div class="shape square"></div>
+      <div class="shape triangle"></div>
+    </div>
+
+    <div class="side-nav">
+      <div class="nav-dot active" onclick="scrollToSection('desc')">
+        <span class="nav-tooltip">Descriptive</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('corr')">
+        <span class="nav-tooltip">Correlation</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('ttest')">
+        <span class="nav-tooltip">T-Test</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('anova')">
+        <span class="nav-tooltip">ANOVA</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('chi')">
+        <span class="nav-tooltip">Chi-Square</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('cronbach')">
+        <span class="nav-tooltip">Cronbach's α</span>
+      </div>
+      <div class="nav-dot" onclick="scrollToSection('info')">
+        <span class="nav-tooltip">Info</span>
+      </div>
+    </div>
+
+    <div id="welcomeScreen">
+      <div class="welcome-content">
+        <h1 style="color: rgba(255, 255, 255, 0.95)">
+          Research Statistics Calculator
+        </h1>
+        <p>
+          Dahil mahirap and math sa PR2 at ayoko nahihirapan sa Statistical
+          Analysis
+        </p>
+        <p>Para sa mga Masipag na Researchers(Masipag ba talga?🤔)</p>
+        <div class="credit">Created by Charles Manalo</div>
+        <div class="continue-btn" onclick="hideWelcome()">
+          Tap the screen to Continue
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <h1>📊 Stats Calculator</h1>
+        <p>Your mobile research companion</p>
+      </div>
+
+      <div class="calc-section" id="desc">
+        <h2 class="section-title">
+          <span class="section-icon">📈</span> Descriptive Statistics
+        </h2>
+        <label>Enter your data (comma-separated numbers):</label>
+        <textarea
+          id="descData"
+          placeholder="e.g., 5, 8, 12, 15, 20, 22, 25"
+        ></textarea>
+        <button onclick="calculateDescriptive()">Calculate</button>
+        <div id="descResult"></div>
+      </div>
+
+      <div class="calc-section" id="corr">
+        <h2 class="section-title">
+          <span class="section-icon">🔗</span> Pearson's Correlation
+        </h2>
+        <label>Variable X (comma-separated):</label>
+        <input type="text" id="corrX" placeholder="e.g., 1, 2, 3, 4, 5" />
+        <label>Variable Y (comma-separated):</label>
+        <input type="text" id="corrY" placeholder="e.g., 2, 4, 5, 4, 5" />
+        <button onclick="calculateCorrelation()">Calculate Correlation</button>
+        <div id="corrResult"></div>
+      </div>
+
+      <div class="calc-section" id="ttest">
+        <h2 class="section-title">
+          <span class="section-icon">🔬</span> Independent T-Test
+        </h2>
+        <label>Group 1 (comma-separated):</label>
+        <input type="text" id="ttest1" placeholder="e.g., 5, 7, 9, 11" />
+        <label>Group 2 (comma-separated):</label>
+        <input type="text" id="ttest2" placeholder="e.g., 6, 8, 10, 12" />
+        <button onclick="calculateTTest()">Calculate T-Test</button>
+        <div id="ttestResult"></div>
+      </div>
+
+      <div class="calc-section" id="anova">
+        <h2 class="section-title">
+          <span class="section-icon">📊</span> One-Way ANOVA
+        </h2>
+        <label>Group 1:</label>
+        <input type="text" id="anova1" placeholder="e.g., 5, 6, 7" />
+        <label>Group 2:</label>
+        <input type="text" id="anova2" placeholder="e.g., 8, 9, 10" />
+        <label>Group 3:</label>
+        <input type="text" id="anova3" placeholder="e.g., 11, 12, 13" />
+        <p class="info-text">Enter at least 2 groups</p>
+        <button onclick="calculateANOVA()">Calculate ANOVA</button>
+        <div id="anovaResult"></div>
+      </div>
+
+      <div class="calc-section" id="chi">
+        <h2 class="section-title">
+          <span class="section-icon">✖️</span> Chi-Square Test
+        </h2>
+        <label>Observed frequencies (comma-separated):</label>
+        <input
+          type="text"
+          id="chiObserved"
+          placeholder="e.g., 10, 15, 20, 25"
+        />
+        <label>Expected frequencies (comma-separated):</label>
+        <input
+          type="text"
+          id="chiExpected"
+          placeholder="e.g., 12, 14, 21, 23"
+        />
+        <button onclick="calculateChiSquare()">Calculate Chi-Square</button>
+        <div id="chiResult"></div>
+      </div>
+
+      <div class="calc-section" id="cronbach">
+        <h2 class="section-title">
+          <span class="section-icon">✅</span> Cronbach's Alpha
+        </h2>
+        <label>Number of items:</label>
+        <input type="number" id="numItems" placeholder="e.g., 5" min="2" />
+        <label
+          >Enter item scores (each row is a respondent, comma-separated):</label
+        >
+        <textarea
+          id="cronbachData"
+          placeholder="e.g.,&#10;5,4,5,4,5&#10;3,3,4,3,4&#10;5,5,5,5,5"
+        ></textarea>
+        <p class="info-text">Each line = one respondent's scores</p>
+        <button onclick="calculateCronbach()">Calculate Reliability</button>
+        <div id="cronbachResult"></div>
+      </div>
+
+      <div class="explanations" id="info">
+        <h2>📚 Statistical Methods Explained</h2>
+
+        <div class="explanation-item">
+          <h3>📈 Descriptive Statistics</h3>
+          <p>
+            Descriptive statistics summarize and describe the main features of a
+            dataset. They include measures of central tendency (mean, median,
+            mode) and measures of variability (range, standard deviation). These
+            statistics help you understand the basic characteristics of your
+            data at a glance, such as what's typical and how spread out the
+            values are.
+          </p>
+        </div>
+
+        <div class="explanation-item">
+          <h3>🔗 Pearson's Correlation</h3>
+          <p>
+            Pearson's correlation coefficient (r) measures the strength and
+            direction of the linear relationship between two continuous
+            variables. Values range from -1 to +1, where -1 indicates a perfect
+            negative correlation, 0 indicates no correlation, and +1 indicates a
+            perfect positive correlation. This test helps determine if two
+            variables move together in a predictable pattern.
+          </p>
+        </div>
+
+        <div class="explanation-item">
+          <h3>🔬 Independent T-Test</h3>
+          <p>
+            An independent t-test compares the means of two separate groups to
+            determine if there is a statistically significant difference between
+            them. It's commonly used in experimental research to compare a
+            treatment group with a control group, or to compare two different
+            populations on a particular measure.
+          </p>
+        </div>
+
+        <div class="explanation-item">
+          <h3>📊 One-Way ANOVA</h3>
+          <p>
+            Analysis of Variance (ANOVA) tests whether there are significant
+            differences between the means of three or more independent groups.
+            It's an extension of the t-test for multiple groups. The F-statistic
+            tells you if at least one group differs significantly from the
+            others, though it doesn't specify which groups differ.
+          </p>
+        </div>
+
+        <div class="explanation-item">
+          <h3>✖️ Chi-Square Test</h3>
+          <p>
+            The chi-square test examines whether observed frequencies differ
+            significantly from expected frequencies in categorical data. It's
+            commonly used to test relationships between categorical variables or
+            to assess goodness-of-fit. This test is particularly useful in
+            survey research and analyzing count data.
+          </p>
+        </div>
+
+        <div class="explanation-item">
+          <h3>✅ Cronbach's Alpha</h3>
+          <p>
+            Cronbach's alpha is a measure of internal consistency reliability
+            for scales or questionnaires. It indicates how closely related a set
+            of items are as a group. Values range from 0 to 1, with values above
+            0.7 generally considered acceptable. Higher values indicate that the
+            items consistently measure the same underlying construct.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Created by Charles Manalo</p>
+        <p>© 2025 Research Statistics Calculator</p>
+      </div>
+    </div>
+
+    <script>
+      function hideWelcome() {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+      }
+
+      function scrollToSection(id) {
+        const element = document.getElementById(id);
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        updateActiveNav();
+      }
+
+      function updateActiveNav() {
+        const sections = [
+          "desc",
+          "corr",
+          "ttest",
+          "anova",
+          "chi",
+          "cronbach",
+          "info",
+        ];
+        const navDots = document.querySelectorAll(".nav-dot");
+
+        let currentSection = 0;
+        sections.forEach((id, index) => {
+          const element = document.getElementById(id);
+          const rect = element.getBoundingClientRect();
+          if (
+            rect.top <= window.innerHeight / 2 &&
+            rect.bottom >= window.innerHeight / 2
+          ) {
+            currentSection = index;
+          }
+        });
+
+        navDots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === currentSection);
+        });
+      }
+
+      window.addEventListener("scroll", updateActiveNav);
+      window.addEventListener("load", updateActiveNav);
+
+      function parseData(str) {
+        return str
+          .split(",")
+          .map((x) => parseFloat(x.trim()))
+          .filter((x) => !isNaN(x));
+      }
+
+      function calculateDescriptive() {
+        const data = parseData(document.getElementById("descData").value);
+        const result = document.getElementById("descResult");
+
+        if (data.length === 0) {
+          result.innerHTML =
+            '<div class="error">Please enter valid numbers</div>';
+          return;
+        }
+
+        const sorted = [...data].sort((a, b) => a - b);
+        const n = data.length;
+        const sum = data.reduce((a, b) => a + b, 0);
+        const mean = sum / n;
+
+        const median =
+          n % 2 === 0
+            ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2
+            : sorted[Math.floor(n / 2)];
+
+        const freq = {};
+        data.forEach((x) => (freq[x] = (freq[x] || 0) + 1));
+        const maxFreq = Math.max(...Object.values(freq));
+        const modes = Object.keys(freq)
+          .filter((k) => freq[k] === maxFreq)
+          .map(Number);
+        const mode = maxFreq > 1 ? modes.join(", ") : "No mode";
+
+        const range = sorted[n - 1] - sorted[0];
+
+        const variance =
+          data.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
+        const sd = Math.sqrt(variance);
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Count (n)</span>
+                        <span class="result-value">${n}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean</span>
+                        <span class="result-value">${mean.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Median</span>
+                        <span class="result-value">${median.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mode</span>
+                        <span class="result-value">${mode}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Range</span>
+                        <span class="result-value">${range.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Standard Deviation</span>
+                        <span class="result-value">${sd.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Variance</span>
+                        <span class="result-value">${variance.toFixed(3)}</span>
+                    </div>
+                </div>
+            `;
+      }
+
+      function calculateCorrelation() {
+        const x = parseData(document.getElementById("corrX").value);
+        const y = parseData(document.getElementById("corrY").value);
+        const result = document.getElementById("corrResult");
+
+        if (x.length === 0 || y.length === 0 || x.length !== y.length) {
+          result.innerHTML =
+            '<div class="error">Both variables must have the same number of valid values</div>';
+          return;
+        }
+
+        const n = x.length;
+        const meanX = x.reduce((a, b) => a + b, 0) / n;
+        const meanY = y.reduce((a, b) => a + b, 0) / n;
+
+        let num = 0,
+          denX = 0,
+          denY = 0;
+        for (let i = 0; i < n; i++) {
+          const dx = x[i] - meanX;
+          const dy = y[i] - meanY;
+          num += dx * dy;
+          denX += dx * dx;
+          denY += dy * dy;
+        }
+
+        const r = num / Math.sqrt(denX * denY);
+        const r2 = r * r;
+
+        let interpretation = "";
+        const absR = Math.abs(r);
+        if (absR < 0.3) interpretation = "Weak";
+        else if (absR < 0.7) interpretation = "Moderate";
+        else interpretation = "Strong";
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>Correlation Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Pearson's r</span>
+                        <span class="result-value">${r.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">R² (coefficient of determination)</span>
+                        <span class="result-value">${r2.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Interpretation</span>
+                        <span class="result-value">${interpretation}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sample size</span>
+                        <span class="result-value">${n}</span>
+                    </div>
+                </div>
+            `;
+      }
+
+      function calculateTTest() {
+        const g1 = parseData(document.getElementById("ttest1").value);
+        const g2 = parseData(document.getElementById("ttest2").value);
+        const result = document.getElementById("ttestResult");
+
+        if (g1.length < 2 || g2.length < 2) {
+          result.innerHTML =
+            '<div class="error">Each group needs at least 2 values</div>';
+          return;
+        }
+
+        const n1 = g1.length,
+          n2 = g2.length;
+        const mean1 = g1.reduce((a, b) => a + b, 0) / n1;
+        const mean2 = g2.reduce((a, b) => a + b, 0) / n2;
+
+        const var1 =
+          g1.reduce((acc, val) => acc + Math.pow(val - mean1, 2), 0) / (n1 - 1);
+        const var2 =
+          g2.reduce((acc, val) => acc + Math.pow(val - mean2, 2), 0) / (n2 - 1);
+
+        const pooledVar = ((n1 - 1) * var1 + (n2 - 1) * var2) / (n1 + n2 - 2);
+        const se = Math.sqrt(pooledVar * (1 / n1 + 1 / n2));
+        const t = (mean1 - mean2) / se;
+        const df = n1 + n2 - 2;
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>T-Test Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Group 1 Mean</span>
+                        <span class="result-value">${mean1.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Group 2 Mean</span>
+                        <span class="result-value">${mean2.toFixed(3)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">t-value</span>
+                        <span class="result-value">${t.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Degrees of Freedom</span>
+                        <span class="result-value">${df}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Standard Error</span>
+                        <span class="result-value">${se.toFixed(4)}</span>
+                    </div>
+                </div>
+            `;
+      }
+
+      function calculateANOVA() {
+        const groups = [];
+        for (let i = 1; i <= 3; i++) {
+          const g = parseData(document.getElementById(`anova${i}`).value);
+          if (g.length > 0) groups.push(g);
+        }
+
+        const result = document.getElementById("anovaResult");
+
+        if (groups.length < 2) {
+          result.innerHTML =
+            '<div class="error">Enter at least 2 groups with data</div>';
+          return;
+        }
+
+        const allData = groups.flat();
+        const N = allData.length;
+        const k = groups.length;
+        const grandMean = allData.reduce((a, b) => a + b, 0) / N;
+
+        let ssb = 0;
+        groups.forEach((g) => {
+          const gMean = g.reduce((a, b) => a + b, 0) / g.length;
+          ssb += g.length * Math.pow(gMean - grandMean, 2);
+        });
+
+        let ssw = 0;
+        groups.forEach((g) => {
+          const gMean = g.reduce((a, b) => a + b, 0) / g.length;
+          g.forEach((val) => {
+            ssw += Math.pow(val - gMean, 2);
+          });
+        });
+
+        const dfb = k - 1;
+        const dfw = N - k;
+        const msb = ssb / dfb;
+        const msw = ssw / dfw;
+        const f = msb / msw;
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>ANOVA Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">F-statistic</span>
+                        <span class="result-value">${f.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Between-group df</span>
+                        <span class="result-value">${dfb}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Within-group df</span>
+                        <span class="result-value">${dfw}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sum of Squares (Between)</span>
+                        <span class="result-value">${ssb.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sum of Squares (Within)</span>
+                        <span class="result-value">${ssw.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean Square (Between)</span>
+                        <span class="result-value">${msb.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Mean Square (Within)</span>
+                        <span class="result-value">${msw.toFixed(4)}</span>
+                    </div>
+                </div>
+            `;
+      }
+
+      function calculateChiSquare() {
+        const obs = parseData(document.getElementById("chiObserved").value);
+        const exp = parseData(document.getElementById("chiExpected").value);
+        const result = document.getElementById("chiResult");
+
+        if (obs.length === 0 || exp.length === 0 || obs.length !== exp.length) {
+          result.innerHTML =
+            '<div class="error">Observed and expected frequencies must have the same length</div>';
+          return;
+        }
+
+        let chiSq = 0;
+        for (let i = 0; i < obs.length; i++) {
+          chiSq += Math.pow(obs[i] - exp[i], 2) / exp[i];
+        }
+
+        const df = obs.length - 1;
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>Chi-Square Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">χ² value</span>
+                        <span class="result-value">${chiSq.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Degrees of Freedom</span>
+                        <span class="result-value">${df}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Categories</span>
+                        <span class="result-value">${obs.length}</span>
+                    </div>
+                </div>
+            `;
+      }
+
+      function calculateCronbach() {
+        const numItems = parseInt(document.getElementById("numItems").value);
+        const dataStr = document.getElementById("cronbachData").value;
+        const result = document.getElementById("cronbachResult");
+
+        if (!numItems || numItems < 2) {
+          result.innerHTML =
+            '<div class="error">Number of items must be at least 2</div>';
+          return;
+        }
+
+        const rows = dataStr.trim().split("\n");
+        const data = rows
+          .map((row) => parseData(row))
+          .filter((row) => row.length === numItems);
+
+        if (data.length < 2) {
+          result.innerHTML =
+            '<div class="error">Need at least 2 complete respondents</div>';
+          return;
+        }
+
+        const n = data.length;
+        const k = numItems;
+
+        const itemVars = [];
+        for (let i = 0; i < k; i++) {
+          const itemScores = data.map((row) => row[i]);
+          const mean = itemScores.reduce((a, b) => a + b, 0) / n;
+          const variance =
+            itemScores.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
+            n;
+          itemVars.push(variance);
+        }
+
+        const totals = data.map((row) => row.reduce((a, b) => a + b, 0));
+        const totalMean = totals.reduce((a, b) => a + b, 0) / n;
+        const totalVar =
+          totals.reduce((acc, val) => acc + Math.pow(val - totalMean, 2), 0) /
+          n;
+
+        const sumItemVars = itemVars.reduce((a, b) => a + b, 0);
+        const alpha = (k / (k - 1)) * (1 - sumItemVars / totalVar);
+
+        let reliability = "";
+        if (alpha >= 0.9) reliability = "Excellent";
+        else if (alpha >= 0.8) reliability = "Good";
+        else if (alpha >= 0.7) reliability = "Acceptable";
+        else if (alpha >= 0.6) reliability = "Questionable";
+        else reliability = "Poor";
+
+        result.innerHTML = `
+                <div class="result-card">
+                    <h3>Reliability Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Cronbach's α</span>
+                        <span class="result-value">${alpha.toFixed(4)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Reliability</span>
+                        <span class="result-value">${reliability}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Number of Items</span>
+                        <span class="result-value">${k}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Number of Respondents</span>
+                        <span class="result-value">${n}</span>
+                    </div>
+                </div>
+            `;
+      }
+    </script>
+  </body>
+</html>
