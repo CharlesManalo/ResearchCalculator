@@ -789,10 +789,33 @@
       window.addEventListener("load", updateActiveNav);
 
       function parseData(str) {
-        return str
-          .split(",")
-          .map((x) => parseFloat(x.trim()))
-          .filter((x) => !isNaN(x));
+        const expanded = [];
+        const parts = str.split(",");
+        
+        for (let part of parts) {
+          part = part.trim();
+          
+          // Check for frequency notation: value*count or count*value
+          if (part.includes("*")) {
+            const [first, second] = part.split("*").map(x => parseFloat(x.trim()));
+            if (!isNaN(first) && !isNaN(second)) {
+              // Determine which is the value and which is the count
+              // Assume the larger number is the count if both are integers
+              const value = first;
+              const count = Math.round(Math.abs(second));
+              for (let i = 0; i < count; i++) {
+                expanded.push(value);
+              }
+            }
+          } else {
+            const num = parseFloat(part);
+            if (!isNaN(num)) {
+              expanded.push(num);
+            }
+          }
+        }
+        
+        return expanded;
       }
 
       function calculateDescriptive() {
